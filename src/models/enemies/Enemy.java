@@ -50,10 +50,7 @@ public abstract class Enemy implements Entity {
     @Override
     public void takeDamage(double damage){
         health -= damage;
-        if(health <= 0){
-            health = 0;
-            System.out.printf("%s foi morto\n", name);
-        }
+        if(health <= 0) health = 0;
     }
 
     @Override

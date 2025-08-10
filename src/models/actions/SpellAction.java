@@ -22,12 +22,6 @@ public class SpellAction extends PlayerActions{
 
     @Override
     public void execute(Entity target) {
-        showDescription(target);
         target.takeDamage(damage);
-    }
-
-    @Override
-    public void showDescription(Entity target) {
-        System.out.printf("%s foi atingido e sofreu %s de dano\n",target,damage);
     }
 }

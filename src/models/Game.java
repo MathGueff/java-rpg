@@ -13,17 +13,17 @@ import java.util.stream.IntStream;
 
 public class Game {
     private final Scanner sc;
-    private Player player;
-    private List<Horde> hordes;
-    private Horde currentHorde;
+    private final Player player;
+    private final List<Enemy> enemies;
     public static GameState gameState;
 
-    public Game(Scanner sc) {
-        this.sc = sc;
+    public Game(Player player, List<Enemy> enemies) {
+        this.player = player;
+        this.enemies = enemies;
+        this.sc = new Scanner(System.in);
     }
 
     public void startGame(){
-        currentHorde = hordes.getFirst();
         System.out.println("O jogo foi iniciado");
         int turn = 1;
         while(gameState != GameState.ENDED && player.getHealth() > 0){
@@ -32,20 +32,14 @@ public class Game {
             playerTurn();
             if(gameState == GameState.ENDED) break;
 
+            System.out.print("\n");
+
             enemiesTurn();
 
-            //turnResume();
-
-            if(currentHorde.getEnemies().isEmpty()){
-                hordes.removeFirst();
-
-                if(hordes.isEmpty()){
-                    System.out.println("Todas as hordas foram derrotadas! Você venceu!");
-                    gameState = GameState.ENDED;
-                    break;
-                } else {
-                    currentHorde = hordes.getFirst();
-                }
+            if(enemies.isEmpty()){
+                System.out.println("Todos inimigos foram derrotados! Você venceu!");
+                gameState = GameState.ENDED;
+                break;
             }
             turn++;
         }
@@ -53,32 +47,31 @@ public class Game {
     }
 
     public void playerTurn(){
-        System.out.println("[Seu turno]\n");
         System.out.println(player.getStatus());
+
         PlayerActions actionChoice = playerChoiceAction();
         if(actionChoice == null) return;
+
         Enemy enemyChoice = playerChoiceEnemy();
+
         player.doAction(actionChoice, enemyChoice);
-        currentHorde.update();
-        System.out.println("\n[Fim do seu turno]\n");
+
+        if(enemyChoice.getHealth() <= 0) enemies.remove(enemyChoice);
+
+        System.out.printf("\n%s usou %s em %s\n", player, actionChoice, enemyChoice);
     }
 
     public void enemiesTurn(){
-        if(!currentHorde.getEnemies().isEmpty()){
-            System.out.println("[Turno dos inimigos]\n");
-            for(var enemy : currentHorde.getEnemies()){
+        if(!enemies.isEmpty()){
+            System.out.println("----Inimigos----");
+            for(var enemy : enemies){
                 if(player.getHealth() > 0) {
                     EnemyAction action = enemy.getActions().getFirst();
                     enemy.doAction(action, player);
+                    System.out.printf("\n%s usou %s em %s\n", enemy, action, player);
                 }
             }
-            System.out.println("\n[Fim do turno dos inimigos]");
         }
-    }
-
-    public void turnResume(){
-        System.out.println(player.getStatus());
-        currentHorde.getEnemies().forEach(e -> System.out.println(e.getStatus()));
     }
 
     public PlayerActions playerChoiceAction(){
@@ -96,6 +89,7 @@ public class Game {
         do{
             System.out.println("----Ações----");
             System.out.println(menuOptions);
+            System.out.print("Escolha: ");
             optionChoice = sc.nextInt();
 
             if(optionChoice == exitOption) {
@@ -114,13 +108,14 @@ public class Game {
 
     public Enemy playerChoiceEnemy(){
         int enemyChoice = 0;
-        System.out.println("----Inimigos----");
-        Map<Integer, Enemy> currentEnemiesOptions = IntStream.range(0, currentHorde.getEnemies().size())
+        System.out.println("\n----Alvo----");
+        Map<Integer, Enemy> currentEnemiesOptions = IntStream.range(0, enemies.size())
                 .boxed()
-                .collect(Collectors.toMap(i -> i + 1, i -> currentHorde.getEnemies().get(i)));
+                .collect(Collectors.toMap(i -> i + 1, i -> enemies.get(i)));
 
         do{
             currentEnemiesOptions.forEach((k,v) -> System.out.printf("%s - %s (%s)\n", k, v, v.getHealth()));
+            System.out.print("Escolha: ");
             enemyChoice = sc.nextInt();
 
             if(enemyChoice < 0 || enemyChoice > currentEnemiesOptions.size()){
@@ -130,13 +125,5 @@ public class Game {
         }while(enemyChoice < 0 || enemyChoice > currentEnemiesOptions.size());
 
         return currentEnemiesOptions.get(enemyChoice);
-    }
-
-    public void setPlayer(Player player) {
-        this.player = player;
-    }
-
-    public void setHordes(List<Horde> hordes) {
-        this.hordes = hordes;
     }
 }

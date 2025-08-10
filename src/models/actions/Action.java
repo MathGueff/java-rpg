@@ -2,10 +2,10 @@ package models.actions;
 
 import models.Entity;
 
+import java.util.List;
+
 public abstract class Action {
     public abstract void execute(Entity target);
-
-    public abstract void showDescription(Entity target);
 
     private String name;
 
