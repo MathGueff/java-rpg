@@ -8,37 +8,52 @@ import models.actions.EnemyAction;
 import java.util.List;
 
 public abstract class Enemy implements Entity {
-    private double life;
-    private List<EnemyAction> actions;
-    private Element element;
+    private final String name;
+    private final double maxHealth;
+    private double health;
+    private final List<EnemyAction> actions;
+    private final Element element;
 
-    public Enemy(double life, List<EnemyAction> actions, Element element) {
-        this.life = life;
+    public Enemy(double maxHealth, List<EnemyAction> actions, Element element) {
+        this.maxHealth = maxHealth;
+        this.health = maxHealth;
         this.element = element;
         this.actions = actions;
+        name = getClass().getSimpleName() + (element != null ? " " + element : "");
     }
 
-    public Enemy(double life, List<EnemyAction> actions) {
-        this.life = life;
+    public Enemy(double maxHealth, List<EnemyAction> actions) {
+        this.maxHealth = maxHealth;
+        this.health = maxHealth;
         this.actions = actions;
+        this.element = null;
+        name = getClass().getSimpleName();
     }
 
     public double getHealth() {
-        return life;
+        return health;
     }
 
     public List<EnemyAction> getActions() {
         return actions;
     }
 
+    public String getStatus(){
+        return String.format("%s %.0f/%.0f", name, health, maxHealth);
+    }
+
     @Override
     public String toString() {
-        return String.format("%s %s", getClass().getSimpleName(), element != null ? element : "");
+        return name;
     }
 
     @Override
     public void takeDamage(double damage){
-        life -= damage;
+        health -= damage;
+        if(health <= 0){
+            health = 0;
+            System.out.printf("%s foi morto\n", name);
+        }
     }
 
     @Override

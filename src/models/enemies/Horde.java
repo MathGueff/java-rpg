@@ -1,6 +1,7 @@
 package models.enemies;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Horde {
     private List<Enemy> enemies;
@@ -14,6 +15,8 @@ public class Horde {
     }
 
     public void update(){
-        enemies = enemies.stream().filter(e -> e.getHealth() > 0).toList();
+        enemies = enemies.stream()
+                .filter(e -> e.getHealth() > 0)
+                .collect(Collectors.toList());
     }
 }

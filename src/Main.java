@@ -19,13 +19,15 @@ public class Main {
         Player player = new Player("Matheus", 200, 10, configurePlayerActions());
         game.setPlayer(player);
 
-        EnemyAction enemyAction1 = new EnemyAction("Corte rápido", 20);
-        EnemyAction enemyAction2 = new EnemyAction("Corte pesado", 100);
+        EnemyAction enemyAction1 = new EnemyAction("Corte rápido", 8);
+        EnemyAction enemyAction2 = new EnemyAction("Corte pesado", 18);
         Enemy enemy = new Rogue(15, List.of(enemyAction1));
         Enemy enemy2 = new Rogue(28, List.of(enemyAction1));
-        Enemy enemy3 = new Rogue(45, List.of(enemyAction2));
+        Enemy enemy3 = new Rogue(45, List.of(enemyAction2), Element.EARTH);
+        Enemy enemy4 = new Rogue(12, List.of(enemyAction1), Element.FIRE);
+        Enemy enemy5 = new Rogue(15, List.of(enemyAction2), Element.EARTH);
         Horde horde1 = new Horde(List.of(enemy, enemy2, enemy3));
-        Horde horde2 = new Horde(List.of(enemy2, enemy3));
+        Horde horde2 = new Horde(List.of(enemy4, enemy5));
 
         List<Horde> hordes = new ArrayList<>();
         hordes.add(horde1);

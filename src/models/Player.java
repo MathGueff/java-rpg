@@ -8,14 +8,18 @@ import java.util.List;
 
 public class Player implements Entity{
     private final String name;
+    private final double maxHealth;
+    private final int maxMana;
     private double health;
     private int mana;
     private final List<PlayerActions> actions;
 
-    public Player(String name, double health, int mana, List<PlayerActions> actions) {
+    public Player(String name, double maxHealth, int maxMana, List<PlayerActions> actions) {
         this.name = name;
-        this.health = health;
-        this.mana = mana;
+        this.maxHealth = maxHealth;
+        this.health = maxHealth;
+        this.maxMana = maxMana;
+        this.mana = maxMana;
         this.actions = actions;
     }
 
@@ -29,14 +33,18 @@ public class Player implements Entity{
     @Override
     public void takeDamage(double damage) {
         health -= damage;
+        if(health <= 0){
+            health = 0;
+            System.out.println("Você morreu!");
+        }
     }
 
     public String getStatus(){
         return String.format("""
                 ----%s----
-                Vida: %s
-                Mana: %s 
-                """, name, health, mana);
+                Vida: %.0f/%.0f
+                Mana: %s/%s\s
+                \s""", name, health,maxHealth, mana, maxMana);
     }
 
     public void decreaseMana(int manaToDecrease){
