@@ -4,13 +4,19 @@ import enums.GameState;
 import models.actions.Action;
 import models.actions.EnemyAction;
 import models.actions.PlayerAction;
-import models.enemies.Enemy;
+import models.entities.Enemy;
+import models.entities.Entity;
+import models.entities.Player;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Random;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 public class Game {
     private final Scanner sc;
@@ -25,17 +31,41 @@ public class Game {
     }
 
     public void startGame(){
-        System.out.println("O jogo foi iniciado");
+        gameState = GameState.STARTED;
+        System.out.println("====---O JOGO FOI INICIADO---====");
         int turn = 1;
         while(gameState != GameState.ENDED && player.getCurrentHealth() > 0){
-            System.out.printf("\n-====Turno %s ====-\n\n",turn);
+            System.out.printf("%n-====Turno %s ====-%n%n",turn);
 
-            playerTurn();
-            if(gameState == GameState.ENDED) break;
+            System.out.println(player.getInfo());
+            System.out.println("----Inimigos----");
+            enemies.forEach(e -> System.out.println(e.getStatus()));
 
-            System.out.print("\n");
 
-            enemiesTurn();
+            List<Entity<?>> playOrder = Stream.<Entity<?>>concat(Stream.of(player), enemies.stream())
+                    .sorted(Comparator.comparingDouble(Entity::getSpeed))
+                    .toList().reversed();
+
+            System.out.println("\nORDEM DE JOGADA:\n");
+
+            playOrder.stream().map(p -> String.format("%s - %s", p.getName(), p.getSpeed()))
+                    .forEach(System.out::println);
+
+            System.out.println("\n[--AÇÕES--]\n");
+
+            for (var entity : playOrder){
+                if(entity.isDead()) continue;
+                if(entity instanceof Player){
+                    playerTurn();
+                    if(gameState == GameState.ENDED) break;
+                } else if (entity instanceof Enemy enemy) {
+                    enemyTurn(enemy);
+                }
+                System.out.println("\n");
+                if(player.isDead()) break;
+            }
+
+            System.out.println("\n[--FIM DAS AÇÕES--]");
 
             if(enemies.isEmpty()){
                 System.out.println("Todos inimigos foram derrotados! Você venceu!");
@@ -44,26 +74,26 @@ public class Game {
             }
             turn++;
         }
-        System.out.println("O jogo foi finalizado");
+        System.out.println("\n====---O JOGO FOI FINALIZADO---====\n");
     }
 
     public void playerTurn(){
-        System.out.println(player.getStatus());
-
-        PlayerAction actionChoice = playerChoiceAction();
-        if(actionChoice == null) return;
-
-        Enemy enemyChoice = playerChoiceEnemy();
-
-        player.doAction(actionChoice, enemyChoice);
-
-        if(enemyChoice.getCurrentHealth() <= 0) enemies.remove(enemyChoice);
-
-        showAttackLog(player, actionChoice, enemyChoice);
+        playerChoiceAction().ifPresentOrElse(selectedAction -> {
+            Enemy selectedEnemy = playerChoiceEnemy();
+            player.doAction(selectedAction, selectedEnemy);
+            System.out.printf("%n");
+            showAttackLog(player, selectedAction, selectedEnemy);
+            if(selectedEnemy.isDead()) {
+                enemies.remove(selectedEnemy);
+                System.out.printf("%n%s foi morto por %s", selectedEnemy.getName(), selectedAction.getName());
+            }
+        }, () -> {
+            System.out.println("Você desistiu");
+        });
     }
 
-    public PlayerAction playerChoiceAction(){
-        int optionChoice = 0;
+    public Optional<PlayerAction> playerChoiceAction(){
+        int selectedAction = 0;
 
         Map<Integer, PlayerAction> playerActionsOptions = IntStream.range(0, player.getActions().size())
                 .boxed()
@@ -75,29 +105,32 @@ public class Game {
         playerActionsOptions.forEach((k,v) -> menuOptions.append(String.format("%s - %s\n", k, v)));
         menuOptions.append(String.format("%s - Desistir", exitOption));
 
+        boolean invalidOption;
         do{
-            System.out.println("----Ações----");
+            invalidOption = false;
+            System.out.println("----Opções----");
             System.out.println(menuOptions);
             System.out.print("Escolha: ");
-            optionChoice = sc.nextInt();
+            selectedAction = sc.nextInt();
 
-            if(optionChoice == exitOption) {
+            if(selectedAction == exitOption) {
                 gameState = GameState.ENDED;
-                return null;
+                return Optional.empty();
             }
 
-            if(optionChoice < 0 || optionChoice > playerActionsOptions.size() + 1){
+            if(selectedAction < 0 || selectedAction > playerActionsOptions.size() + 1){
                 System.out.println("Escolha uma opção válida!");
+                invalidOption = true;
             }
 
-        }while(optionChoice < 0 || optionChoice > playerActionsOptions.size() + 1);
+        }while(invalidOption);
 
-        return playerActionsOptions.get(optionChoice);
+        return Optional.of(playerActionsOptions.get(selectedAction));
     }
 
     public Enemy playerChoiceEnemy() {
-        int enemyChoice = 0;
-        System.out.println("\n----Alvo(s)----");
+        int selectedEnemy = 0;
+        System.out.println("\n----Alvos----");
         Map<Integer, Enemy> enemiesOptions = IntStream.range(0, enemies.size())
                 .boxed()
                 .collect(Collectors.toMap(i -> i + 1, enemies::get));
@@ -105,11 +138,11 @@ public class Game {
         boolean validTargets;
         do {
             validTargets = false;
-            enemiesOptions.forEach((k, v) -> System.out.printf("%s - %s\n", k, v.getStatus()));
+            enemiesOptions.forEach((k, v) -> System.out.printf("%s - %s%n", k, v.getStatus()));
             System.out.print("Escolha: ");
-            enemyChoice = sc.nextInt();
+            selectedEnemy = sc.nextInt();
 
-            if (enemyChoice < 0 || enemyChoice > enemiesOptions.size()) {
+            if (selectedEnemy < 0 || selectedEnemy > enemiesOptions.size()) {
                 System.out.println("Escolha um inimigo válido");
                 continue;
             }
@@ -118,27 +151,21 @@ public class Game {
 
         } while (!validTargets);
 
-        return enemiesOptions.get(enemyChoice);
+        return enemiesOptions.get(selectedEnemy);
     }
 
-    public void enemiesTurn() {
-        if (!enemies.isEmpty()) {
-            float allDamage = 0f;
-            System.out.println("----Inimigos----");
-            enemies.forEach(e -> System.out.println(e.getStatus()));
-            for (var enemy : enemies) {
-                if (player.getCurrentHealth() > 0) {
-                    EnemyAction action = enemy.getActions().getFirst();
-                    enemy.doAction(action, player);
-                    allDamage += action.getRealDamage(enemy);
-                    showAttackLog(enemy, action, player);
-                }
-            }
-            System.out.printf("\nVocê recebeu no total %s de dano\n", allDamage);
-        }
+    public void enemyTurn(Enemy enemy){
+        Random random = new Random();
+        EnemyAction action = enemy.getActions().get(random.nextInt(0, enemy.getActions().size()));
+        enemy.doAction(action, player);
+        showAttackLog(enemy, action, player);
+        if(player.isDead()) System.out.printf("%nO jogador %s foi morto por %s de %s",player.getName(), action.getName(), enemy.getName());
     }
 
     public void showAttackLog(Entity actor, Action action, Entity target){
-        System.out.printf("\n%s usou %s em %s, causando %s de dano\n", actor, action.getName(), target, action.getRealDamage(actor));
+        System.out.printf("%s: %s usou %s em %s, causando %.0f de dano -> %s (-%.0f)",
+                actor instanceof Player ? "Você" : "Inimigo",
+                actor, action.getName(), target, action.getRealDamage(actor),
+                    target.getStatus(), action.getRealDamage(actor));
     }
 }

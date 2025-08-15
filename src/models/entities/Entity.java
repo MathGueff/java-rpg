@@ -1,4 +1,4 @@
-package models;
+package models.entities;
 
 import models.actions.Action;
 
@@ -9,7 +9,7 @@ public abstract class Entity<T>{
     private final float baseDamage;
     private final float maxHealth;
     private float currentHealth;
-    private float speed;
+    private final float speed;
     private final List<T> actions;
 
     public Entity(String name, float baseDamage, float maxHealth, float speed, List<T> actions) {
@@ -25,8 +25,19 @@ public abstract class Entity<T>{
         currentHealth -= baseDamage;
         if(currentHealth < 0) currentHealth = 0;
     }
-    public void doAction(Action action, Entity... targets){
+
+    public void doAction(Action action, Entity<?>... targets){
+        if(targets == null || targets.length == 0)
+            throw new IllegalArgumentException("Pelo menos 1 alvo deve ser fornecido");
         action.execute(this, targets);
+    }
+
+    public String getStatus(){
+        return String.format("%s - %.0f/%.0f", name, currentHealth, maxHealth);
+    }
+
+    public boolean isDead(){
+        return currentHealth <= 0;
     }
 
     public String getName() {
@@ -56,8 +67,6 @@ public abstract class Entity<T>{
     public T getAction(int i){
         return actions.get(i);
     }
-
-    public abstract String getStatus();
 
     @Override
     public String toString() {

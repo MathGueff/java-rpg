@@ -1,6 +1,6 @@
 package models.actions;
 
-import models.Entity;
+import models.entities.Entity;
 
 public abstract class Action {
     public abstract void execute(Entity actor, Entity... targets);

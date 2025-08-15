@@ -1,6 +1,6 @@
 package models.actions;
 
-import models.Entity;
+import models.entities.Entity;
 
 public class EnemyAction extends Action{
     public EnemyAction(String name, float damage) {
@@ -9,6 +9,7 @@ public class EnemyAction extends Action{
 
     @Override
     public void execute(Entity actor, Entity... targets) {
-        targets[0].takeDamage(getRealDamage(actor));
+        for(var target : targets)
+            target.takeDamage(getRealDamage(actor));
     }
 }

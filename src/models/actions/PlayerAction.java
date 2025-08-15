@@ -1,6 +1,6 @@
 package models.actions;
 
-import models.Entity;
+import models.entities.Entity;
 
 public class PlayerAction extends Action{
 

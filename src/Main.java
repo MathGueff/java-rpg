@@ -1,20 +1,25 @@
 import enums.Element;
 import models.Game;
-import models.Player;
+import models.entities.Player;
 import models.actions.EnemyAction;
 import models.actions.PlayerAction;
-import models.enemies.Enemy;
+import models.entities.Enemy;
 import enums.EnemyType;
-
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 public class Main {
-    private static final int ENEMIES_MAX_COUNT = 10;
-    private static final int ENEMIES_MIN_COUNT = 3;
-    private static final int ENEMY_MAX_LIFE = 50;
+    private static final int ENEMIES_MIN_COUNT = 1;
+    private static final int ENEMIES_MAX_COUNT = 20;
     private static final int ENEMY_MIN_LIFE = 10;
+    private static final int ENEMY_MAX_LIFE = 50;
+    private static final int ENEMY_MIN_SPEED = 1;
+    private static final int ENEMY_MAX_SPEED = 10;
+    private static final int ENEMY_MAX_ACTIONS = 5;
+    private static final Random random = new Random();
 
     public static void main(String[] args) {
         Player player = getPlayer();
@@ -38,22 +43,25 @@ public class Main {
     }
 
     private static Enemy getEnemy(){
-        var random = new Random();
-        List<EnemyAction> allEnemiesActions = new ArrayList<>(getEnemiesActions());
         //Vida
         int enemyLife = random.nextInt(ENEMY_MIN_LIFE,ENEMY_MAX_LIFE);
         //Elemento
         int enemyElement = random.nextInt(0,Element.values().length);
         //Velocidade
-        float enemySpeed = random.nextFloat(0, 10);
+        float enemySpeed = random.nextFloat(ENEMY_MIN_SPEED, ENEMY_MAX_SPEED);
         //Ações
-        int actionIndex = random.nextInt(0, allEnemiesActions.size());
+        int actionCount = random.nextInt(2,getEnemiesActions().size() - (getEnemiesActions().size() - ENEMY_MAX_ACTIONS));
+        Set<EnemyAction> enemyAction = new HashSet<>();
+        for (int i = 0; i < actionCount; i++) {
+            int randomAction = random.nextInt(0, getEnemiesActions().size());
+            enemyAction.add(getEnemiesActions().get(randomAction));
+        }
         //Tipo
         int enemyType = random.nextInt(0, EnemyType.values().length);
         return new Enemy(
             enemyLife,
             enemySpeed,
-            List.of(allEnemiesActions.get(actionIndex)),
+            enemyAction.stream().toList(),
             EnemyType.values()[enemyType],
             Element.values()[enemyElement]
         );

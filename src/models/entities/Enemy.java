@@ -1,7 +1,6 @@
-package models.enemies;
+package models.entities;
 
 import enums.Element;
-import models.Entity;
 import models.actions.EnemyAction;
 import enums.EnemyType;
 
@@ -21,10 +20,5 @@ public class Enemy extends Entity<EnemyAction> {
         );
         this.type = type;
         this.element = element;
-    }
-
-    @Override
-    public String getStatus(){
-        return String.format("%s %s/%s", getName(), getCurrentHealth(), getMaxHealth());
     }
 }
