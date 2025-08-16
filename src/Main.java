@@ -1,5 +1,7 @@
 import enums.Element;
 import models.Game;
+import models.GameController;
+import models.GameView;
 import models.entities.Player;
 import models.actions.EnemyAction;
 import models.actions.PlayerAction;
@@ -9,6 +11,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Scanner;
 import java.util.Set;
 
 public class Main {
