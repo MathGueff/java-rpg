@@ -9,6 +9,8 @@ public class Player extends Entity<PlayerAction> {
         super(name, 1, maxHealth, speed, actions);
     }
 
+
+
     public String getInfo(){
         return String.format("""
                 ----%s----

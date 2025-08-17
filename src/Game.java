@@ -1,7 +1,8 @@
-package models;
-
+import controller.GameController;
 import models.entities.Enemy;
 import models.entities.Player;
+import view.GameView;
+
 import java.util.List;
 import java.util.Scanner;
 
@@ -17,7 +18,7 @@ public class Game {
 
     public void startGame(){
         gameView.gameStarted();
-        gameController.startTurns();
+        gameController.startGame();
         gameView.gameFinished();
     }
 }

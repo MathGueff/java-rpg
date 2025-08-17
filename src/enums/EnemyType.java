@@ -1,13 +1,13 @@
 package enums;
 
 public enum EnemyType {
-    ROGUE("Rogue", 1f, 0.8f, 2f),
-    WARRIOR("Warrior",0.5f, 1.5f, 0.6f),
-    MAGE("Mage", 1.5f,0.5f,0.8f),
-    GIANT("Giant", 3f, 2.5f,0.2f),
-    SPIDER("Spider", 1f, 0.5f, 1f),
-    SLIME("Slime", 0.2f, 1f,1f),
-    EXECUTOR("Executor", 5f, 1.2f, 0.1f);
+    ROGUE("Rogue", 1.4f, 0.7f, 2.0f),
+    WARRIOR("Warrior", 0.9f, 1.8f, 0.7f),
+    MAGE("Mage", 1.8f, 0.6f, 0.9f),
+    GIANT("Giant", 1.2f, 3.0f, 0.4f),
+    SPIDER("Spider", 1.0f, 0.8f, 1.6f),
+    SLIME("Slime", 0.6f, 1.2f, 0.8f),
+    EXECUTOR("Executor", 1.3f, 1.5f, 1.2f);
 
     private final String name;
     private final float damageModifier;

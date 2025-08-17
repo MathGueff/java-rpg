@@ -1,8 +1,8 @@
 package models.entities;
 
 import enums.Element;
-import models.actions.EnemyAction;
 import enums.EnemyType;
+import models.actions.EnemyAction;
 
 import java.util.List;
 
@@ -14,8 +14,8 @@ public class Enemy extends Entity<EnemyAction> {
         super(
                 String.format("%s %s", element.getName(),type.getName()).trim(),
                 type.getDamageModifier(),
-                Math.round(maxHealth * type.getHealthModifier()),
-                Math.round(speed * type.getSpeedModifier()),
+                maxHealth * type.getHealthModifier(),
+                speed * type.getSpeedModifier(),
                 actions
         );
         this.type = type;

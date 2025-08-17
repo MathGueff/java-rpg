@@ -1,12 +1,14 @@
-package models;
+package controller;
 
 import enums.GameState;
+import view.GameView;
 import models.actions.EnemyAction;
 import models.actions.PlayerAction;
 import models.entities.Enemy;
 import models.entities.Entity;
 import models.entities.Player;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -28,7 +30,8 @@ public class GameController {
         this.enemies = enemies;
     }
 
-    public void startTurns(){
+    public void startGame(){
+        player.setName(gameView.setPlayerName());
         int turn = 1;
         while(gameState != GameState.ENDED && !player.isDead()){
             gameView.showActualTurn(turn);
@@ -63,7 +66,17 @@ public class GameController {
                 break;
             }
             turn++;
+
+            resetCooldowns();
+
         }
+    }
+
+    public void resetCooldowns(){
+        Stream.concat(
+                player.getActions().stream(),
+                enemies.stream().flatMap(e -> e.getActions().stream())
+        ).forEach(a -> a.decreaseCooldown(1));
     }
 
     public void playerTurn(){
@@ -81,10 +94,19 @@ public class GameController {
 
     public Optional<PlayerAction> playerChoiceAction(){
         int selectedAction = 0;
+        int optionIndex = 1;
 
-        Map<Integer, PlayerAction> playerActionsOptions = IntStream.range(0, player.getActions().size())
+        Map<Integer, PlayerAction> playerActionsOptions = new HashMap<>();
+
+        for (var actionAvailable : player.getAvailableActions()){
+            playerActionsOptions.put(optionIndex, actionAvailable);
+            optionIndex++;
+        }
+
+        /* Map<Integer, PlayerAction> playerActionsOptions = IntStream.range(0, player.getAvailableActions().size())
                 .boxed()
-                .collect(Collectors.toMap(i -> i + 1, player::getAction));
+                .collect(Collectors.toMap(i -> i + 1, player::getAction)); */
+
         int exitOption = playerActionsOptions.size() + 1;
 
         String options = gameView.mapPlayerOptions(playerActionsOptions,player);

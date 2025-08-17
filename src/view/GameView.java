@@ -1,4 +1,4 @@
-package models;
+package view;
 
 import models.actions.Action;
 import models.actions.PlayerAction;
@@ -28,6 +28,7 @@ public class GameView {
 
     public void gameFinished(){
         System.out.println("====---O JOGO FOI FINALIZADO---====");
+        scanner.close();
     }
 
     public void actionsStarted(){
@@ -94,7 +95,8 @@ public class GameView {
     public void showPlayOrder(List<Entity<?>> playOrder) {
         System.out.println("\nORDEM DE JOGADA:\n");
 
-        playOrder.stream().map(p -> String.format("%s - %s", p.getName(), p.getSpeed()))
+        playOrder.stream()
+                .map(e -> String.format("%s - %.0f velocidade", e.getName(), e.getSpeed()))
                 .forEach(System.out::println);
     }
 
@@ -119,5 +121,21 @@ public class GameView {
         enemiesOptions.forEach((k, v) -> System.out.printf("%s - %s%n", k, v.getStatus()));
         System.out.print("Escolha: ");
         return scanner.nextInt();
+    }
+
+    public String setPlayerName(){
+        String name;
+        boolean validName = false;
+        do{
+            validName = true;
+            System.out.println("Digite o nome para o personagem: ");
+            name = scanner.nextLine();
+
+            if(!name.matches("[a-zA-Z ]+")){
+                System.out.println("Digite um nome válido");
+                validName = false;
+            }
+        } while(!validName);
+        return name;
     }
 }

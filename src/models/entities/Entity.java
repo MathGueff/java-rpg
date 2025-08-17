@@ -4,8 +4,8 @@ import models.actions.Action;
 
 import java.util.List;
 
-public abstract class Entity<T>{
-    private final String name;
+public abstract class Entity<T extends Action>{
+    private String name;
     private final float baseDamage;
     private final float maxHealth;
     private float currentHealth;
@@ -44,6 +44,10 @@ public abstract class Entity<T>{
         return name;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public float getBaseDamage() {
         return baseDamage;
     }
@@ -62,6 +66,10 @@ public abstract class Entity<T>{
 
     public List<T> getActions() {
         return actions;
+    }
+
+    public List<T> getAvailableActions() {
+        return actions.stream().filter(Action::canUse).toList();
     }
 
     public T getAction(int i){
