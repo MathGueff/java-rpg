@@ -1,5 +1,6 @@
 package models.entities;
 
+import enums.Element;
 import models.actions.Action;
 
 import java.util.List;
@@ -11,14 +12,16 @@ public abstract class Entity<T extends Action>{
     private float currentHealth;
     private final float speed;
     private final List<T> actions;
+    private final Element element;
 
-    public Entity(String name, float baseDamage, float maxHealth, float speed, List<T> actions) {
+    public Entity(String name, float baseDamage, float maxHealth, float speed, List<T> actions, Element element) {
         this.name = name;
         this.baseDamage = baseDamage;
         this.maxHealth = maxHealth;
         this.currentHealth = this.maxHealth;
         this.speed = speed;
         this.actions = actions;
+        this.element = element;
     }
 
     public void takeDamage(float baseDamage){
@@ -74,6 +77,10 @@ public abstract class Entity<T extends Action>{
 
     public T getAction(int i){
         return actions.get(i);
+    }
+
+    public Element getElement() {
+        return element;
     }
 
     @Override

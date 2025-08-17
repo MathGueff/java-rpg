@@ -11,9 +11,17 @@ import java.util.Scanner;
 
 public class GameView {
     private final Scanner scanner;
+    private final GameLogger gameLogger;
 
-    public GameView(Scanner scanner) {
+    public GameView(Scanner scanner, GameLogger gameLogger) {
         this.scanner = scanner;
+        this.gameLogger = gameLogger;
+    }
+
+    public void showTurnResume(int i){
+        System.out.printf("TURNO %s - RESUMO%n", i);
+        System.out.println(gameLogger.getResume());
+        gameLogger.clear();
     }
 
     public void spacing(int i){
@@ -24,6 +32,11 @@ public class GameView {
 
     public void gameStarted(){
         System.out.println("====---O JOGO FOI INICIADO---====");
+    }
+
+    public void showElementsInteractions(){
+        System.out.println("FRAQUEZAS: ");
+        System.out.println("AIR -> EARTH -> LIGHTNING -> WATER -> FIRE -> AIR");
     }
 
     public void gameFinished(){
@@ -47,11 +60,27 @@ public class GameView {
         System.out.printf("%n-====Turno %s ====-%n%n",turn);
     }
 
+    public void endTurn(){
+        System.out.println("Digite qualquer coisa e pressione enter para encerrar o turno");
+        scanner.next();
+        scanner.nextLine();
+    }
+
     public void showAttackDescription(Entity<?> actor, Action action, Entity<?> target){
-        System.out.printf("%s: %s usou %s em %s, causando %.0f de dano -> %s (-%.0f)",
+        float totalDamage = action.getRealDamage(actor, target);
+
+        String description = String.format("%s: %s usou %s em %s, causando %.0f de dano -> %s (-%.0f) ",
                 actor instanceof Player ? "Você" : "Inimigo",
-                actor, action.getName(), target, action.getRealDamage(actor),
-                target.getStatus(), action.getRealDamage(actor));
+                actor, action.getName(), target, totalDamage,
+                target.getStatus(), totalDamage);
+
+        if(action.isStrong(target))
+            description += "BÔNUS DE FRAQUEZA";
+
+        gameLogger.appendLog(description);
+        if(target instanceof  Player) gameLogger.addDamageOnPlayer(totalDamage);
+
+        System.out.printf(description);
     }
 
     public void showVictoryMessage(){
@@ -100,6 +129,9 @@ public class GameView {
                 .forEach(System.out::println);
     }
 
+    public void enemySkipTurn(Enemy enemy){
+        System.out.printf("%s passou a vez\n", enemy.getName());
+    }
 
     public String mapPlayerOptions(Map<Integer, PlayerAction> playerActionsOptions, Player player){
         int exitOption = playerActionsOptions.size() + 1;

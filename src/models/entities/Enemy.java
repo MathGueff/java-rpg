@@ -8,17 +8,16 @@ import java.util.List;
 
 public class Enemy extends Entity<EnemyAction> {
     private final EnemyType type;
-    private final Element element;
 
-    public Enemy(float maxHealth, float speed, List<EnemyAction> actions, EnemyType type, Element element) {
+    public Enemy(float maxHealth, float speed, List<EnemyAction> actions, Element element, EnemyType type) {
         super(
                 String.format("%s %s", element.getName(),type.getName()).trim(),
                 type.getDamageModifier(),
                 maxHealth * type.getHealthModifier(),
                 speed * type.getSpeedModifier(),
-                actions
+                actions,
+                element
         );
         this.type = type;
-        this.element = element;
     }
 }

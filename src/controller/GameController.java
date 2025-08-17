@@ -1,6 +1,7 @@
 package controller;
 
 import enums.GameState;
+import models.actions.Action;
 import view.GameView;
 import models.actions.EnemyAction;
 import models.actions.PlayerAction;
@@ -31,14 +32,17 @@ public class GameController {
     }
 
     public void startGame(){
+        gameView.showElementsInteractions();
         player.setName(gameView.setPlayerName());
         int turn = 1;
         while(gameState != GameState.ENDED && !player.isDead()){
             gameView.showActualTurn(turn);
 
+            resetCooldowns();
+
             gameView.showEntities(player, enemies);
 
-            List<Entity<?>> playOrder = Stream.<Entity<?>>concat(Stream.of(player), enemies.stream())
+            List<Entity<?>> playOrder = Stream.concat(Stream.of(player), enemies.stream())
                     .sorted(Comparator.comparingDouble(Entity::getSpeed))
                     .toList().reversed();
 
@@ -59,16 +63,19 @@ public class GameController {
             }
 
             gameView.actionsFinished();
+            gameView.showTurnResume(turn);
 
             if(enemies.isEmpty()){
                 gameView.showVictoryMessage();
                 gameState = GameState.ENDED;
                 break;
             }
+
+            if(player.isDead()) break;
+
+            gameView.endTurn();
+
             turn++;
-
-            resetCooldowns();
-
         }
     }
 
@@ -76,7 +83,7 @@ public class GameController {
         Stream.concat(
                 player.getActions().stream(),
                 enemies.stream().flatMap(e -> e.getActions().stream())
-        ).forEach(a -> a.decreaseCooldown(1));
+        ).forEach(Action::decreaseCooldown);
     }
 
     public void playerTurn(){
@@ -93,7 +100,7 @@ public class GameController {
     }
 
     public Optional<PlayerAction> playerChoiceAction(){
-        int selectedAction = 0;
+        int selectedAction;
         int optionIndex = 1;
 
         Map<Integer, PlayerAction> playerActionsOptions = new HashMap<>();
@@ -102,10 +109,6 @@ public class GameController {
             playerActionsOptions.put(optionIndex, actionAvailable);
             optionIndex++;
         }
-
-        /* Map<Integer, PlayerAction> playerActionsOptions = IntStream.range(0, player.getAvailableActions().size())
-                .boxed()
-                .collect(Collectors.toMap(i -> i + 1, player::getAction)); */
 
         int exitOption = playerActionsOptions.size() + 1;
 
@@ -132,7 +135,7 @@ public class GameController {
     }
 
     public Enemy playerChoiceEnemy() {
-        int selectedEnemy = 0;
+        int selectedEnemy;
         gameView.showEnemiesOptionsHeader();
         Map<Integer, Enemy> enemiesOptions = IntStream.range(0, enemies.size())
                 .boxed()
@@ -157,7 +160,13 @@ public class GameController {
 
     public void enemyTurn(Enemy enemy){
         Random random = new Random();
-        EnemyAction action = enemy.getActions().get(random.nextInt(0, enemy.getActions().size()));
+        List<EnemyAction> actions = enemy.getAvailableActions();
+        if(actions.isEmpty()){
+            gameView.enemySkipTurn(enemy);
+            return;
+        }
+
+        EnemyAction action = actions.get(random.nextInt(0, actions.size()));
         enemy.doAction(action, player);
         gameView.showAttackDescription(enemy, action, player);
         if(player.isDead()) gameView.showPlayerDeath(player, enemy, action);
