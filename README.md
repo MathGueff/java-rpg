@@ -13,7 +13,7 @@ Durante desenvolvimento, busquei utilizar os conhecimentos que adquiri durante a
 - StringBuilder: concatenação otimizada em loops extensos (logger de turnos).
 
 ## Objetivo do projeto: 
-Desenvolver senso crítico de escolhas no desenvolvimento em POO, encapsulamento adequado do código, reutilização de funcionalidades e métodos.
+Praticar escolhas no desenvolvimento em POO, encapsulamento adequado do código, reutilização de funcionalidades e métodos.
 
 Como executar
 1. Baixe o código-fonte.
@@ -25,7 +25,7 @@ O maior desafio foi traduzir a lógica de um RPG para a estrutura de POO no Java
 Essa experiência consolidou conceitos como a escolha entre interfaces x classes abstratas e o uso correto de estruturas de dados.
 
 <p align=center>
-<img width="514" height="468" alt="image" src="https://github.com/user-attachments/assets/67211c21-6dc6-41e7-bcaa-04c7398c3cb2" />
-<img width="525" height="471" alt="image" src="https://github.com/user-attachments/assets/7871ac49-fa9f-46b4-944c-5cd57dc4329a" />
-<img width="527" height="162" alt="image" src="https://github.com/user-attachments/assets/3b28edab-f89f-41f1-8c88-bf56e9fb8736" />
+<img width="498" height="246" alt="image" src="https://github.com/user-attachments/assets/f1f3437e-79cc-4f0f-bcd4-1190fe300d19" />
+<img width="513" height="377" alt="image" src="https://github.com/user-attachments/assets/f41f35ee-5150-411b-9f87-27a267caced8" />
+<img width="517" height="263" alt="image" src="https://github.com/user-attachments/assets/e948d164-da41-4e9d-867e-a170d64ba6dc" />
 </p>
